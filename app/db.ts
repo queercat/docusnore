@@ -78,11 +78,9 @@ export class Docusnore {
 
     data[key].push(value);
 
-    await file.writeFile(JSON.stringify(data));
-
-    console.log(JSON.stringify(data))
-
+    await file.writeFile(JSON.stringify(data), {encoding: "utf-8"});
     await this.releaseLock();
+    await file.close();
   }
 
   public async deleteAsync() {
