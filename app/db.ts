@@ -7,7 +7,7 @@ export class Docusnore {
     this.fileLocation = fileLocation;
   }
 
-  private async getFileHandle(mode: Parameters<typeof fs.open>[2]): Promise<fs.FileHandle | undefined> {
+  private async getFileHandle(mode: string): Promise<fs.FileHandle | undefined> {
     let file = undefined;
 
     try {
@@ -39,7 +39,50 @@ export class Docusnore {
     }
   }
 
-  public async addAsync() {
+  private async dropFile(): Promise<void> {
+    try {
+      await fs.unlink(this.fileLocation);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  public async addAsync(key: string, value: string | object) {
+    if (typeof value === "string") {
+      value = JSON.parse(value);
+    }
+
+    const lock = await this.getLock();
+
+    if (!lock) {
+      throw new Error("Could not get lock");
+    }
+
+    const file = await this.getFileHandle("w+");
+
+    if (!file) {
+      throw new Error("Could not open file");
+    }
+
+    let content = await file.readFile({encoding: "utf-8"});
+
+    if (!content) {
+      content = "{}";
+    }
+
+    const data = JSON.parse(content);
+
+    if (!data[key]) {
+      data[key] = [];
+    }
+
+    data[key].push(value);
+
+    await file.writeFile(JSON.stringify(data));
+
+    console.log(JSON.stringify(data))
+
+    await this.releaseLock();
   }
 
   public async deleteAsync() {
