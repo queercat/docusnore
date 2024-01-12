@@ -1,4 +1,4 @@
-# what is docusnore?
+# what is docusnore? ![](https://github.com/queercat/docusnore/actions/workflows/node.js.yml/badge.svg)
 
 docusnore is a tiny implementation (220~ lines) of a JSON store with an easy to use high level API.
 
