@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, expect, test } from "vitest";
 import fs from "fs/promises";
 import { Docusnore } from "./db";
+import {faker} from "@faker-js/faker";
 
 let db: Docusnore;
 
@@ -58,4 +59,38 @@ test("Can get a key", async () => {
 
   expect(value?.at(0)).toMatchObject({value: "test"});
   expect(value2?.at(0)).toMatchObject({value: "test2"});
+});
+
+test("Can update on a filter", async () => {
+  await db.add("people", {name: "rainbow dash"})
+  await db.add("people", {name: "applejack"})
+  await db.add("people", {name: "fluttershy"})
+
+  await db.update("people", {name: "pinkie pie"}, (item) => item.name === "applejack");
+
+  const people = await db.get("people");
+
+  expect(people.includes({name: "applejack"})).toBe(false);
+  expect(people.filter((item: any) => item.name === "pinkie pie").length).toBe(1);
+});
+
+test("Can do a complex update", async () => {
+  const needle = "applejack";
+  const haystack = [];
+
+  for (let i = 0; i < 10_000; i++) {
+    haystack.push({name: faker.person.firstName()});
+  }
+
+  haystack.push({name: needle});
+  haystack.sort(() => Math.random() - 0.5);
+
+  await db.addMany("people", haystack);
+
+  await db.update("people", {name: "why y'all fryin air?"}, (item) => item.name === needle);
+
+  const people = await db.get("people");
+
+  expect(people.includes({name: needle})).toBe(false);
+  expect(people.filter((item: any) => item.name === "why y'all fryin air?").length).toBe(1);
 });

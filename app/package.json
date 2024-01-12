@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/queercat/docusnore#readme",
   "devDependencies": {
+    "@faker-js/faker": "^8.3.1",
     "@typescript-eslint/eslint-plugin": "^6.18.1",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
