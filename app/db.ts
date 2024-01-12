@@ -9,14 +9,9 @@ export class Docusnore {
   }
 
   public async initStore() {
-    const file = await fs.open(this.fileLocation, "w+");
+    this.hasInit = false;
 
-    if (file === undefined) {
-      throw new Error("Could not get file handle");
-    }
-
-    await file.writeFile("{}", {encoding: "utf-8"});
-    await file.close();
+    await fs.writeFile(this.fileLocation, "{}", {flag: "w+"});
 
     this.hasInit = true;
   }
@@ -50,14 +45,24 @@ export class Docusnore {
   }
 
   private async releaseLock(): Promise<void> {
-    try {
-      await fs.unlink(this.fileLocation + ".lock");
-    } catch (error) {
-      console.error(error);
-    }
+    await fs.unlink(this.fileLocation + ".lock");
   }
 
-  public async addAsync(key: string, value: string | object) {
+  public async get(key: string): Promise<string | undefined> {
+    let file = await this.getFileHandle("r");
+
+    if (file === undefined) {
+      throw new Error("Could not get file handle");
+    }
+
+    let content = await file.readFile({encoding: "utf-8"});
+
+    const data = JSON.parse(content) || {};
+
+    return data[key];
+  }
+
+  public async add(key: string, value: string | object) {
     if (typeof value === "string") {
       value = JSON.parse(value);
     }
@@ -91,9 +96,11 @@ export class Docusnore {
     }
 
     await file.writeFile(JSON.stringify(data), {encoding: "utf-8"});
-    await this.releaseLock();
+
     await file.close();
     await readHandle.close();
+
+    await this.releaseLock();
   }
 
   public async deleteAsync() {
