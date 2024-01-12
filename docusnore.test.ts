@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, expect, test } from "vitest";
 import fs from "fs/promises";
-import { Docusnore } from "./db";
+import { Docusnore } from "./docusnore";
 import {faker} from "@faker-js/faker";
 
 let db: Docusnore;
