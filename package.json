@@ -1,7 +1,7 @@
 {
-  "name": "app",
-  "version": "0.0.0",
-  "description": "",
+  "name": "docusnore",
+  "version": "0.1.0",
+  "description": "tiny docustore",
   "main": "db.ts",
   "scripts": {
     "start": "ts-node db.ts",
