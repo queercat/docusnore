@@ -46,6 +46,6 @@ test("Can add a key", async () => {
   content = await file.readFile({encoding: "utf-8"});
   parsed = JSON.parse(content);
 
-  expect(parsed.test).toBeDefined();
-  expect(parsed.test2).toBeDefined();
+  expect(parsed.test[0]).toMatchObject({value: "test"});
+  expect(parsed.test2[0]).toMatchObject({value: "test2"});
 });
