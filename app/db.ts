@@ -134,7 +134,15 @@ export class Docusnore {
     await this.write(data);
   }
 
-  public async deleteAsync() {
+  public async remove(key: string, filter?: (item: any) => boolean) {
+    const data = await this.read();
 
+    if (filter === undefined) {
+      data[key] = [];
+    } else {
+      data[key] = data[key].filter((item: any) => !filter(item));
+    }
+
+    await this.write(data);
   }
 }

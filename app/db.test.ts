@@ -94,3 +94,39 @@ test("Can do a complex update", async () => {
   expect(people.includes({name: needle})).toBe(false);
   expect(people.filter((item: any) => item.name === "why y'all fryin air?").length).toBe(1);
 });
+
+test("Can do a complex remove", async () => {
+  const needle = "applejack";
+  const haystack = [];
+
+  for (let i = 0; i < 10_000; i++) {
+    haystack.push({name: faker.person.firstName()});
+  }
+
+  haystack.push({name: needle});
+  haystack.sort(() => Math.random() - 0.5);
+
+  await db.addMany("people", haystack);
+  await db.remove("people", (item) => item.name === needle);
+
+  const people = await db.get("people");
+
+  expect(people.includes({name: needle})).toBe(false);
+});
+
+test("Can do a complex remove with no filter", async () => {
+  const haystack = [];
+
+  for (let i = 0; i < 10_000; i++) {
+    haystack.push({name: faker.person.firstName()});
+  }
+
+  haystack.sort(() => Math.random() - 0.5);
+
+  await db.addMany("people", haystack);
+  await db.remove("people");
+
+  const people = await db.get("people");
+
+  expect(people.length).toBe(0);
+})
