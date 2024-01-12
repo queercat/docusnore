@@ -129,4 +129,17 @@ test("Can do a complex remove with no filter", async () => {
   const people = await db.get("people");
 
   expect(people.length).toBe(0);
-})
+});
+
+test("Can remove a key", async () => {
+  await db.add("test", {value: "test"});
+  await db.removeKey("test");
+
+  const file = await fs.open("test.docusnore", "r");
+  const content = await file.readFile({encoding: "utf-8"});
+  const parsed = JSON.parse(content);
+
+  expect(parsed.test).toBe(undefined);
+
+  await file.close();
+});

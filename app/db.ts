@@ -145,4 +145,12 @@ export class Docusnore {
 
     await this.write(data);
   }
+
+  public async removeKey(key: string) {
+    const data = await this.read();
+
+    delete data[key];
+
+    await this.write(data);
+  }
 }
