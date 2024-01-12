@@ -8,6 +8,9 @@ export class Docusnore {
     this.fileLocation = fileLocation;
   }
 
+  /**
+   * @desc Creates the initial file. This should only be called once and will throw an error if the file already exists.
+   */
   public async initStore() {
     this.hasInit = false;
 
@@ -16,6 +19,11 @@ export class Docusnore {
     this.hasInit = true;
   }
 
+  /**
+   * 
+   * @param mode - The mode to open the file in. See https://nodejs.org/api/fs.html#fs_file_system_flags for more information.
+   * @returns A file handle or undefined if the file could not be opened.
+   */
   private async getFileHandle(mode: string): Promise<fs.FileHandle | undefined> {
     if (!this.hasInit) {
       throw new Error("Docusnore has not been initialized");
@@ -32,6 +40,10 @@ export class Docusnore {
     return file;
   }
 
+  /**
+   * @desc Attempts to get a lock on the file. If the lock is already taken, this will return false.
+   * @returns True if the lock was acquired, false if it was not.
+   */
   private async getLock(): Promise<boolean> {
     let hasLock = true;
 
@@ -44,10 +56,19 @@ export class Docusnore {
     return hasLock;
   }
 
+  /**
+   * @desc Releases the lock on the file by deleting the lock file.
+   */
   private async releaseLock(): Promise<void> {
     await fs.unlink(this.fileLocation + ".lock");
   }
 
+  /**
+   * This will get a key from the store. If a filter is provided, it will return an array of items that match the filter.
+   * @param key the key to get from the store.
+   * @param filter the filter to apply to the key, if any.
+   * @returns the value of the key or an array of values if a filter is provided.
+   */
   public async get(key: string, filter?: (item: any) => boolean): Promise<any | undefined> {
     const data = await this.read();
 
@@ -58,11 +79,26 @@ export class Docusnore {
     return data[key].filter(filter);
   }
 
-  public async first(key: string, filter: (item: any) => boolean): Promise<any | undefined> {
+  /**
+   * 
+   * @param key the key to get from the store.
+   * @param filter the filter to apply to the key, if any.
+   * @returns the first value of the key or the first value that matches the filter.
+   */
+  public async first(key: string, filter?: (item: any) => boolean): Promise<any | undefined> {
     const data = await this.read();
+
+    if (filter === undefined) {
+      return data[key]?.[0];
+    }
+
     return data[key].find(filter);
   }
 
+  /**
+   * @desc Gets the entire contents of the store.
+   * @returns the entire contents of the store as an object.
+   */
   private async read(): Promise<any> {
     const file = await this.getFileHandle("r");
 
@@ -79,6 +115,10 @@ export class Docusnore {
     return data;
   }
 
+  /**
+   * @desc Writes data to the store.
+   * @param data the data to write to the store.
+   */
   private async write(data: object): Promise<void> {
     const lock = await this.getLock();
 
@@ -98,6 +138,12 @@ export class Docusnore {
     await this.releaseLock();
   }
 
+  /**
+   * @desc Updates a key in the store. If a filter is provided, it will only update the items that match the filter.
+   * @param key the key to update.
+   * @param value the value to update the key with. This can be a function that takes the current value and returns the new value.
+   * @param filter the filter to apply to the key, if any.
+   */
   public async update(key: string, value: object | ((item: any) => object), filter: (item: any) => boolean) {
     const data = await this.read();
     const updated = data[key].map((item: any) => {
@@ -116,7 +162,12 @@ export class Docusnore {
 
     await this.write(data);
   }
-  
+ 
+  /**
+   * @desc Adds a key to the store.
+   * @param key the key to add to the store.
+   * @param values the values to add to the store.
+   */
   public async addMany(key: string, values: object[]) {
     const data = await this.read();
 
@@ -129,6 +180,11 @@ export class Docusnore {
     await this.write(data);
   }
 
+  /**
+   * @desc Adds a key to the store. 
+   * @param key the key to add to the store.
+   * @param value the value to add to the store.
+   */
   public async add(key: string, value: object) {
     const data = await this.read();
 
@@ -141,6 +197,11 @@ export class Docusnore {
     await this.write(data);
   }
 
+  /**
+   * @desc Removes a key from the store. If a filter is provided, it will only remove the items that match the filter.
+   * @param key the key to remove from the store.
+   * @param filter the filter to apply to the key, if any.
+   */
   public async remove(key: string, filter?: (item: any) => boolean) {
     const data = await this.read();
 
@@ -153,6 +214,10 @@ export class Docusnore {
     await this.write(data);
   }
 
+  /**
+   * @desc Removes a key from the store and all of its contents.
+   * @param key the key to remove from the store.
+   */
   public async removeKey(key: string) {
     const data = await this.read();
 
