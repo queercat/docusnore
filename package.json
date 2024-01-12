@@ -2,9 +2,9 @@
   "name": "docusnore",
   "version": "0.1.0",
   "description": "tiny docustore",
-  "main": "db.ts",
+  "main": "docusnore.ts",
   "scripts": {
-    "start": "ts-node db.ts",
+    "start": "ts-node docusnore.ts",
     "test": "vitest"
   },
   "repository": {

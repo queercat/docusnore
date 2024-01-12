@@ -226,3 +226,5 @@ export class Docusnore {
     await this.write(data);
   }
 }
+
+module.exports = Docusnore;
