@@ -56,6 +56,16 @@ export class Docusnore {
     return data[key];
   }
 
+  public async where(key: string, filter: (item: any) => boolean): Promise<any[]> {
+    const data = await this.read();
+    return data[key].filter(filter);
+  }
+
+  public async first(key: string, filter: (item: any) => boolean): Promise<any | undefined> {
+    const data = await this.read();
+    return data[key].find(filter);
+  }
+
   private async read(): Promise<any> {
     const file = await this.getFileHandle("r");
 
