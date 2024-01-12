@@ -31,6 +31,21 @@ test("Can't get lock when it's already locked", async () => {
 });
 
 test("Can add a key", async () => {
+  await db.initStore();
   await db.addAsync("test", {value: "test"});
-  await db.addAsync("test", {value: "test2"});
+
+  let file = await fs.open("test.docusnore", "r");
+  let content = await file.readFile({encoding: "utf-8"});
+  let parsed = JSON.parse(content);
+
+  expect(parsed.test).toBeDefined();
+
+  await db.addAsync("test2", {value: "test2"});
+
+  file = await fs.open("test.docusnore", "r");
+  content = await file.readFile({encoding: "utf-8"});
+  parsed = JSON.parse(content);
+
+  expect(parsed.test).toBeDefined();
+  expect(parsed.test2).toBeDefined();
 });

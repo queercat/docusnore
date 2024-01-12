@@ -2,12 +2,30 @@ import fs from "fs/promises";
 
 export class Docusnore {
   private fileLocation: string = "";
+  private hasInit: boolean = false;
 
   constructor(fileLocation: string) {
     this.fileLocation = fileLocation;
   }
 
+  public async initStore() {
+    const file = await fs.open(this.fileLocation, "w+");
+
+    if (file === undefined) {
+      throw new Error("Could not get file handle");
+    }
+
+    await file.writeFile("{}", {encoding: "utf-8"});
+    await file.close();
+
+    this.hasInit = true;
+  }
+
   private async getFileHandle(mode: string): Promise<fs.FileHandle | undefined> {
+    if (!this.hasInit) {
+      throw new Error("Docusnore has not been initialized");
+    }
+
     let file = undefined;
 
     try {
@@ -39,14 +57,6 @@ export class Docusnore {
     }
   }
 
-  private async dropFile(): Promise<void> {
-    try {
-      await fs.unlink(this.fileLocation);
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
   public async addAsync(key: string, value: string | object) {
     if (typeof value === "string") {
       value = JSON.parse(value);
@@ -58,25 +68,27 @@ export class Docusnore {
       throw new Error("Could not get lock");
     }
 
-    const file = await this.getFileHandle("w+");
+    let readHandle = await this.getFileHandle("r");
 
-    if (!file) {
-      throw new Error("Could not open file");
+    if (readHandle === undefined) {
+      throw new Error("Could not get file handle");
     }
 
-    let content = await file.readFile({encoding: "utf-8"});
+    let content = await readHandle.readFile({encoding: "utf-8"});
 
-    if (!content) {
-      content = "{}";
-    }
+    const data = JSON.parse(content) || {};
 
-    const data = JSON.parse(content);
-
-    if (!data[key]) {
+    if (data[key] === undefined) {
       data[key] = [];
     }
 
     data[key].push(value);
+
+    const file = await this.getFileHandle("w+");
+
+    if (file === undefined) {
+      throw new Error("Could not get file handle");
+    }
 
     await file.writeFile(JSON.stringify(data), {encoding: "utf-8"});
     await this.releaseLock();
