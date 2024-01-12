@@ -48,16 +48,13 @@ export class Docusnore {
     await fs.unlink(this.fileLocation + ".lock");
   }
 
-  public async get(key: string): Promise<any | undefined> {
-    const content = await this.read();
-
-    const data = content || {};
-
-    return data[key];
-  }
-
-  public async where(key: string, filter: (item: any) => boolean): Promise<any[]> {
+  public async get(key: string, filter?: (item: any) => boolean): Promise<any | undefined> {
     const data = await this.read();
+
+    if (filter === undefined) {
+      return data[key];
+    }
+
     return data[key].filter(filter);
   }
 

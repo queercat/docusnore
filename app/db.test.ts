@@ -144,16 +144,6 @@ test("Can remove a key", async () => {
   await file.close();
 });
 
-test("Where filter", async () => {
-  await db.add("people", {name: "rainbow dash", type: "pegasus"})
-  await db.add("people", {name: "applejack", type: "earth pony"})
-  await db.add("people", {name: "fluttershy", type: "pegasus"})
-
-  const pegasus = await db.where("people", (item) => item.type === "pegasus");
-
-  expect(pegasus.length).toBe(2);
-});
-
 test("First filter", async () => {
   await db.add("people", {name: "rainbow dash", type: "pegasus"})
   await db.add("people", {name: "applejack", type: "earth pony"})
@@ -162,4 +152,17 @@ test("First filter", async () => {
   const pegasus = await db.first("people", (item) => item.type === "pegasus");
 
   expect(pegasus).toMatchObject({name: "rainbow dash", type: "pegasus"});
+});
+
+test("Get where", async () => {
+  await db.add("people", {name: "rainbow dash", type: "pegasus"})
+  await db.add("people", {name: "applejack", type: "earth pony"})
+  await db.add("people", {name: "fluttershy", type: "pegasus"})
+
+  const pegasus = await db.get("people", (item) => item.type === "pegasus");
+
+  expect(pegasus).toMatchObject([
+    {name: "rainbow dash", type: "pegasus"},
+    {name: "fluttershy", type: "pegasus"},
+  ]);
 });
