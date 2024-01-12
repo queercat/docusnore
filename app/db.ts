@@ -93,6 +93,7 @@ export class Docusnore {
     await file.writeFile(JSON.stringify(data), {encoding: "utf-8"});
     await this.releaseLock();
     await file.close();
+    await readHandle.close();
   }
 
   public async deleteAsync() {
