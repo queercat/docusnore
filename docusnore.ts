@@ -107,7 +107,7 @@ export class Docusnore {
       throw new Error("Could not get file handle");
     }
 
-    await file.writeFile(JSON.stringify(data), {encoding: "utf-8"});
+    await file.writeFile(JSON.stringify(data, undefined, 2), {encoding: "utf-8"});
     await file.close();
 
     await this.releaseLock();
