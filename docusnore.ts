@@ -14,7 +14,14 @@ export class Docusnore {
   public async initStore() {
     this.hasInit = false;
 
-    await fs.writeFile(this.fileLocation, "{}", {flag: "wx"});
+    try {
+      await fs.writeFile(this.fileLocation, "{}", {flag: "wx"});
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      if (error.code !== "EEXIST") {
+        throw error;
+      }
+    }
 
     this.hasInit = true;
   }
@@ -147,7 +154,7 @@ export class Docusnore {
    * @param filter the filter to apply to the key, if any.
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public async update<T extends object = any>(key: string, value: object | ((item: T) => object), filter: (item: T) => boolean) {
+  public async update<T extends object = any>(key: string, value: T | ((item: T) => T), filter: (item: T) => boolean) {
     const data = await this.read();
     const updated = data[key].map((item: T) => {
       if (filter(item)) {
@@ -232,5 +239,3 @@ export class Docusnore {
     await this.write(data);
   }
 }
-
-module.exports = Docusnore;
