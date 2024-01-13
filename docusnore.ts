@@ -64,40 +64,6 @@ export class Docusnore {
   }
 
   /**
-   * This will get a key from the store. If a filter is provided, it will return an array of items that match the filter.
-   * @param key the key to get from the store.
-   * @param filter the filter to apply to the key, if any.
-   * @returns the value of the key or an array of values if a filter is provided.
-   */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public async get<T extends object = any>(key: string, filter?: (item: object) => boolean): Promise<T | undefined> {
-    const data = await this.read();
-
-    if (filter === undefined) {
-      return data[key];
-    }
-
-    return data[key].filter(filter);
-  }
-
-  /**
-   * 
-   * @param key the key to get from the store.
-   * @param filter the filter to apply to the key, if any.
-   * @returns the first value of the key or the first value that matches the filter.
-   */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public async first<T extends object = any>(key: string, filter?: (item: T) => boolean): Promise<T | undefined> {
-    const data = await this.read();
-
-    if (filter === undefined) {
-      return data[key]?.[0];
-    }
-
-    return data[key].find(filter);
-  }
-
-  /**
    * @desc Gets the entire contents of the store.
    * @returns the entire contents of the store as an object.
    */
@@ -141,6 +107,40 @@ export class Docusnore {
   }
 
   /**
+   * This will get a key from the store. If a filter is provided, it will return an array of items that match the filter.
+   * @param key the key to get from the store.
+   * @param filter the filter to apply to the key, if any.
+   * @returns the value of the key or an array of values if a filter is provided.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public async get<T extends object = any>(key: string, filter?: (item: T) => boolean): Promise<Array<T> | undefined> {
+    const data = await this.read();
+
+    if (filter === undefined) {
+      return data[key];
+    }
+
+    return data[key].filter(filter);
+  }
+
+  /**
+   * 
+   * @param key the key to get from the store.
+   * @param filter the filter to apply to the key, if any.
+   * @returns the first value of the key or the first value that matches the filter.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public async first<T extends object = any>(key: string, filter?: (item: T) => boolean): Promise<T | undefined> {
+    const data = await this.read();
+
+    if (filter === undefined) {
+      return data[key]?.[0];
+    }
+
+    return data[key].find(filter);
+  }
+
+  /**
    * @desc Updates a key in the store. If a filter is provided, it will only update the items that match the filter.
    * @param key the key to update.
    * @param value the value to update the key with. This can be a function that takes the current value and returns the new value.
@@ -171,7 +171,8 @@ export class Docusnore {
    * @param key the key to add to the store.
    * @param values the values to add to the store.
    */
-  public async addMany(key: string, values: object[]) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public async addMany<T extends object = any>(key: string, values: T[]) {
     const data = await this.read();
 
     if (data[key] === undefined) {
