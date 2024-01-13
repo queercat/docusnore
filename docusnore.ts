@@ -154,9 +154,17 @@ export class Docusnore {
    * @param filter the filter to apply to the key, if any.
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public async update<T extends object = any>(key: string, value: T | ((item: T) => T), filter: (item: T) => boolean) {
+  public async update<T extends object = any>(key: string, value: T | ((item: T) => T), filter?: (item: T) => boolean) {
     const data = await this.read();
     const updated = data[key].map((item: T) => {
+      if (filter === undefined) {
+        if (typeof value !== "function") {
+          return value;
+        }
+
+        return value(item);
+      }
+
       if (filter(item)) {
         if (typeof value !== "function") {
           return value;
