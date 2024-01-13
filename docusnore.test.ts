@@ -21,17 +21,17 @@ afterEach(async () => {
 });
 
 test("Can get a lock", async () => {
-  // @ts-ignore
+  // @ts-expect-error - This is a private method
   const lock = await db.getLock();
   expect(lock).toBe(true);
 });
 
 test("Can't get lock when it's already locked", async () => {
-  // @ts-ignore
+  // @ts-expect-error - This is a private method
   const lock = await db.getLock();
   expect(lock).toBe(true);
 
-  // @ts-ignore
+  // @ts-expect-error - This is a private method
   const lock2 = await db.getLock();
   expect(lock2).toBe(false);
 });
@@ -62,16 +62,16 @@ test("Can get a key", async () => {
 });
 
 test("Can update on a filter", async () => {
-  await db.add("people", {name: "rainbow dash"})
-  await db.add("people", {name: "applejack"})
-  await db.add("people", {name: "fluttershy"})
+  await db.add("people", {name: "rainbow dash"});
+  await db.add("people", {name: "applejack"});
+  await db.add("people", {name: "fluttershy"});
 
   await db.update("people", {name: "pinkie pie"}, (item) => item.name === "applejack");
 
   const people = await db.get("people");
 
-  expect(people.includes({name: "applejack"})).toBe(false);
-  expect(people.filter((item: any) => item.name === "pinkie pie").length).toBe(1);
+  expect(people?.includes({name: "applejack"})).toBe(false);
+  expect(people?.filter((item: { name: string; }) => item.name === "pinkie pie").length).toBe(1);
 });
 
 test("Can do a complex update", async () => {
@@ -91,8 +91,8 @@ test("Can do a complex update", async () => {
 
   const people = await db.get("people");
 
-  expect(people.includes({name: needle})).toBe(false);
-  expect(people.filter((item: any) => item.name === "why y'all fryin air?").length).toBe(1);
+  expect(people?.includes({name: needle})).toBe(false);
+  expect(people?.filter((item: { name: string; }) => item.name === "why y'all fryin air?").length).toBe(1);
 });
 
 test("Can do a complex remove", async () => {
@@ -111,7 +111,7 @@ test("Can do a complex remove", async () => {
 
   const people = await db.get("people");
 
-  expect(people.includes({name: needle})).toBe(false);
+  expect(people?.includes({name: needle})).toBe(false);
 });
 
 test("Can do a complex remove with no filter", async () => {
@@ -128,7 +128,7 @@ test("Can do a complex remove with no filter", async () => {
 
   const people = await db.get("people");
 
-  expect(people.length).toBe(0);
+  expect(people?.length).toBe(0);
 });
 
 test("Can remove a key", async () => {
@@ -145,21 +145,21 @@ test("Can remove a key", async () => {
 });
 
 test("First filter", async () => {
-  await db.add("people", {name: "rainbow dash", type: "pegasus"})
-  await db.add("people", {name: "applejack", type: "earth pony"})
-  await db.add("people", {name: "fluttershy", type: "pegasus"})
+  await db.add("people", {name: "rainbow dash", type: "pegasus"});
+  await db.add("people", {name: "applejack", type: "earth pony"});
+  await db.add("people", {name: "fluttershy", type: "pegasus"});
 
-  const pegasus = await db.first("people", (item) => item.type === "pegasus");
+  const pegasus = await db.first<{name: string, type:string}>("people", (item) => item.type === "pegasus");
 
   expect(pegasus).toMatchObject({name: "rainbow dash", type: "pegasus"});
 });
 
 test("Get where", async () => {
-  await db.add("people", {name: "rainbow dash", type: "pegasus"})
-  await db.add("people", {name: "applejack", type: "earth pony"})
-  await db.add("people", {name: "fluttershy", type: "pegasus"})
+  await db.add("people", {name: "rainbow dash", type: "pegasus"});
+  await db.add("people", {name: "applejack", type: "earth pony"});
+  await db.add("people", {name: "fluttershy", type: "pegasus"});
 
-  const pegasus = await db.get("people", (item) => item.type === "pegasus");
+  const pegasus = await db.get<{name: string, type: string}>("people", (item) => item.type === "pegasus");
 
   expect(pegasus).toMatchObject([
     {name: "rainbow dash", type: "pegasus"},

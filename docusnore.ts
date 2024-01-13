@@ -69,7 +69,8 @@ export class Docusnore {
    * @param filter the filter to apply to the key, if any.
    * @returns the value of the key or an array of values if a filter is provided.
    */
-  public async get(key: string, filter?: (item: any) => boolean): Promise<any | undefined> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public async get<T extends object = any>(key: string, filter?: (item: object) => boolean): Promise<T | undefined> {
     const data = await this.read();
 
     if (filter === undefined) {
@@ -85,7 +86,8 @@ export class Docusnore {
    * @param filter the filter to apply to the key, if any.
    * @returns the first value of the key or the first value that matches the filter.
    */
-  public async first(key: string, filter?: (item: any) => boolean): Promise<any | undefined> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public async first<T extends object = any>(key: string, filter?: (item: T) => boolean): Promise<T | undefined> {
     const data = await this.read();
 
     if (filter === undefined) {
@@ -99,6 +101,7 @@ export class Docusnore {
    * @desc Gets the entire contents of the store.
    * @returns the entire contents of the store as an object.
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private async read(): Promise<any> {
     const file = await this.getFileHandle("r");
 
@@ -106,8 +109,7 @@ export class Docusnore {
       throw new Error("Could not get file handle");
     }
 
-    let content = await file.readFile({encoding: "utf-8"});
-
+    const content = await file.readFile({encoding: "utf-8"});
     const data = JSON.parse(content) || {};
 
     await file.close();
@@ -123,7 +125,7 @@ export class Docusnore {
     const lock = await this.getLock();
 
     if (!lock) {
-      throw new Error("Could not get lock");
+      throw new Error("Cgould not get lock");
     }
 
     const file = await this.getFileHandle("w+");
@@ -144,9 +146,10 @@ export class Docusnore {
    * @param value the value to update the key with. This can be a function that takes the current value and returns the new value.
    * @param filter the filter to apply to the key, if any.
    */
-  public async update(key: string, value: object | ((item: any) => object), filter: (item: any) => boolean) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public async update<T extends object = any>(key: string, value: object | ((item: T) => object), filter: (item: T) => boolean) {
     const data = await this.read();
-    const updated = data[key].map((item: any) => {
+    const updated = data[key].map((item: T) => {
       if (filter(item)) {
         if (typeof value !== "function") {
           return value;
@@ -185,7 +188,8 @@ export class Docusnore {
    * @param key the key to add to the store.
    * @param value the value to add to the store.
    */
-  public async add(key: string, value: object) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public async add<T extends object = any>(key: string, value: T) {
     const data = await this.read();
 
     if (data[key] === undefined) {
@@ -202,13 +206,14 @@ export class Docusnore {
    * @param key the key to remove from the store.
    * @param filter the filter to apply to the key, if any.
    */
-  public async remove(key: string, filter?: (item: any) => boolean) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public async remove<T extends object = any>(key: string, filter?: (item: T) => boolean) {
     const data = await this.read();
 
     if (filter === undefined) {
       data[key] = [];
     } else {
-      data[key] = data[key].filter((item: any) => !filter(item));
+      data[key] = data[key].filter((item: T) => !filter(item));
     }
 
     await this.write(data);
